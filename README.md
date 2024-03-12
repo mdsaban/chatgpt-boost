@@ -8,7 +8,7 @@ This extension will create a table of content for your chat conversations. It wi
 ** We do not read/store any of your chat conversations
 
 ## How to use
-Download the extension.zip file from [here](extension.zip "download") and extract it.
+Download the extension.zip file from [here](extension.zip) and extract it.
 
 Go to Manage extensions or directly enter `chrome://extensions/` in your browser
 1. Enable Developer mode
@@ -18,4 +18,4 @@ Go to Manage extensions or directly enter `chrome://extensions/` in your browser
 
 ![image](public/guide.png)
 
-Facing any issues? Message me [here]("https://twitter.com/iamsaban")
+Facing any issues? Message me [here](https://twitter.com/iamsaban)
