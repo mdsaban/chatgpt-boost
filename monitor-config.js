@@ -3,8 +3,10 @@ window.__CHATGPT_MONITOR_RESPONSE = {};
 window.__CHATGPT_MONITOR_REQUEST = [];
 window.__CHATGPT_USER_MESSAGES = {};
 window.__CHATGPT_MONITOR_CONFIG = {
-  apiPattern: /^https:\/\/chatgpt\.com\/backend-api\/conversation(?:\/[0-9a-f-]+)?$/,
+  apiPattern: /^https:\/\/chatgpt\.com\/backend-api(?:\/[^\/]*)?\/conversation(?:\/[0-9a-f-]+)?$/,
   shouldLogRequest: function(url) {
+    console.log(url, this.apiPattern.test(url))
+
     return this.apiPattern.test(url);
   },
   filterUserMessages: function() {
@@ -89,6 +91,9 @@ window.__CHATGPT_MONITOR_CONFIG = {
       }
 
       contentWrapper.appendChild(fullMappingSection);
+      
+      // Scroll to the bottom to show the latest messages
+      fullMappingSection.scrollTop = fullMappingSection.scrollHeight;
     } else if (retryCount < 5) {
       setTimeout(() => {
         this.updateMonitorDiv(retryCount + 1);
@@ -96,17 +101,21 @@ window.__CHATGPT_MONITOR_CONFIG = {
     }
   },
   logResponse: function(url, response, request) {
+    console.log(url, response, request)
     if(typeof response === 'object') {
       window.__CHATGPT_MONITOR_RESPONSE = response;
       window.__CHATGPT_MONITOR_REQUEST= []
       window.__CHATGPT_USER_MESSAGES = {}
     }
 
-    // POST request for delete chat
-    if(request?.is_visible === false) {
+    // POST request for delete chat or new wchat
+    const isDeleteChat = request && request?.is_visible === false
+    const isNewChat = request && !request.conversation_id
+    if(isDeleteChat || isNewChat) {
+      window.__CHATGPT_MONITOR_RESPONSE = {}
       window.__CHATGPT_MONITOR_REQUEST= []
       window.__CHATGPT_USER_MESSAGES = {}
-      return 
+      if(isDeleteChat) return 
     }
     // POST request for new chat
     if(request) {
