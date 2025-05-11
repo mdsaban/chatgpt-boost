@@ -41,6 +41,10 @@ function createToggleButton() {
   button.style.fontSize = "14px";
   button.onclick = toggleMonitor;
   document.body.appendChild(button);
+  
+  // Make button draggable
+  makeDraggable(button);
+  
   return button;
 }
 
@@ -73,8 +77,19 @@ function createMonitorDiv() {
   closeButton.style.padding = "0 5px";
   closeButton.onclick = toggleMonitor;
   
+  // Create draggable header
+  const dragHandle = document.createElement("div");
+  dragHandle.style.paddingBottom = "5px";
+  dragHandle.style.marginBottom = "5px";
+  dragHandle.style.cursor = "move";
+  dragHandle.style.fontSize = "14px";
+  dragHandle.style.fontWeight = "600";
+  dragHandle.style.borderBottom = "1px solid rgba(255, 255, 255, 0.1)";
+  dragHandle.innerHTML = "User Messages";
+  
   // Create content wrapper
   const contentWrapper = document.createElement("div");
+  contentWrapper.classList.add("content-wrapper");
   contentWrapper.innerHTML = '<div style="margin: 0 0 10px 0;">Loading...</div>';
   
   // add a style to the div
@@ -91,8 +106,7 @@ function createMonitorDiv() {
   div.style.borderRadius = "5px";
   div.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
   div.style.maxWidth = "360px";
-  div.style.maxHeight = "400px";
-  div.style.overflow = "auto";
+  div.style.minWidth = "360px";
   div.style.fontSize = "14px";
   div.style.fontFamily = "system-ui, -apple-system, sans-serif";
   div.style.display = "none";
@@ -104,16 +118,62 @@ function createMonitorDiv() {
   reportLink.innerHTML = "Report an issue";
   reportLink.style.position = "absolute";
   reportLink.style.bottom = "0";
-  reportLink.style.right = "0";
+  reportLink.style.right = "4px";
   reportLink.style.padding = "4px";
   reportLink.style.textAlign = "right";
   reportLink.style.borderTop = "1px solid rgba(255, 255, 255, 0.1)";
   reportLink.style.width = "100%";
   
   div.appendChild(closeButton);
+  div.appendChild(dragHandle);
   div.appendChild(contentWrapper);
   div.appendChild(reportLink);
   document.body.appendChild(div);
+  
+  // Make div draggable
+  makeDraggable(div, dragHandle);
+}
+
+// Function to make an element draggable
+function makeDraggable(element, dragHandle) {
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  
+  if (dragHandle) {
+    // If present, the dragHandle is where you move the element from
+    dragHandle.onmousedown = dragMouseDown;
+  } else {
+    // Otherwise, move the element from anywhere inside it
+    element.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e.preventDefault();
+    // Get the mouse cursor position at startup
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // Call function whenever the cursor moves
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e.preventDefault();
+    // Calculate the new cursor position
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // Set the element's new position
+    element.style.top = (element.offsetTop - pos2) + "px";
+    element.style.left = (element.offsetLeft - pos1) + "px";
+    element.style.right = "auto"; // Remove the right position so it doesn't conflict
+  }
+
+  function closeDragElement() {
+    // Stop moving when mouse button is released
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
 }
 
 attachMonitor();
